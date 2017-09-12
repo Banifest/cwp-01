@@ -1,10 +1,6 @@
-console.log('Hello World');
+const fs = require("fs");
 
-const name = process.argv[2];
+let name = process.argv[2];
 
-console.log(`Hi ${name}!`);
+let file = fs.writeFileSync(`${name}/summary.js`);
 
-for(let i = 2; i<process.argv.length; i++)
-{
-    console.log(` ${process.argv[i]} `);
-}
