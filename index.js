@@ -10,8 +10,7 @@ let file = fs.writeFile(`${name}/summary.js`,'','',function (err) {
     fs.readdir(name, (err, files) => {
         files.forEach(file => {
             console.log(file);
-
-            let str = name + '/' + file;
+            let str = `${name}/${file}`;
             fs.stat(str, function(err, stats){
                 if(stats.isDirectory())
                 {
@@ -19,26 +18,30 @@ let file = fs.writeFile(`${name}/summary.js`,'','',function (err) {
                         deepFiles.forEach(deepFile => {
                             console.log(file + '/' + deepFile);
                             fs.stat(`${str}/${deepFile}`, (err, deepStats) => {
-                                if(deepStats.isFile())
-                                {
-                                    if (deepFile.length >= 4 && deepFile.indexOf('.txt') != -1) {
-                                        console.log(deepFile);
-                                        fs.createReadStream(`${name}/${file}/${deepFile}`)
-                                            .pipe(fs.createWriteStream(`${name}/${lastDir}/${deepFile}`));
-                                    }
+                                if (deepStats.isFile() && deepFile.length >= 4 && deepFile.indexOf('.txt') !== -1) {
+
                                 }
                             })
                         })
                     })
                 }
-                else
-                {
-                    if (file.length >= 4 && file.indexOf('.txt') != -1) {
-                        console.log(file);
-                        fs.createReadStream(`${name}/${file}`).pipe(fs.createWriteStream(`${name}/${lastDir}/${file}`));
-                    }
+                else if (file.length >= 4 && file.indexOf('.txt') !== -1) {
+                    fs.readFile(`${name}/${file}`, (err, deepStr) => {
+                        fs.writeFile(`${name}/${lastDir}/${file}`, `${deepStr.toString()}`, () => {
+                        });
+                    })
                 }
             })
         });
     })
+    fs.readFile('config.json', (err, str) => {
+       console.log(str.toString());
+        fs.readdir(`${name}/${lastDir}`, (err, files) => {
+            files.forEach(file => {
+                fs.readFile(`${name}/${lastDir}/${file}`, (err, deepStr) => {
+                    fs.writeFile(`${name}/${lastDir}/${file}`, `${str.toString()}${deepStr.toString()}${str.toString()}`, () => {});
+                });
+            })
+        })
+    });
 });
