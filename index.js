@@ -5,6 +5,17 @@ let name = process.argv[2];
 
 let lastDir = path.normalize(name).split('\\').pop();
 
+if (name != undefined){
+
+    fs.stat(name, function(err, stats) {
+        if (err || !(stats.isDirectory())) {
+            console.error("Неверный путь!");
+        }
+    });
+} else {
+    console.error("Не указан путь к папке");
+}
+
 fs.writeFile(`${name}/summary.js`,'const fs = require("fs");\n' +
     'const path = require("path");\n' +
     '\n' +
@@ -51,4 +62,7 @@ fs.writeFile(`${name}/summary.js`,'const fs = require("fs");\n' +
     '        if (filename) { console.log(filename.toString()); }\n' +
     '    });\n' +
     '});'
-    , ()=> {});
+    , (error)=> {
+        if (error)
+            console.error("Ошибка создания файла!");
+    });
