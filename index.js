@@ -5,7 +5,32 @@ let name = process.argv[2];
 
 let lastDir = path.normalize(name).split('\\').pop();
 
-let file = fs.writeFile(`${name}/summary.js`,'','',function (err) {
+/*
+
+if (pathDirectory != undefined){
+
+    fs.stat(pathDirectory, function(err, stats) {
+
+        if (err || !(stats.isDirectory())) {
+            console.error("Неверный путь!");
+        }
+        else {
+
+            fs.writeFile(pathDirectory + '\\summary.js', stringScript, function(error){
+                if (error)
+                    console.error("Ошибка создания файла!");
+            });
+
+            console.log('node ' + pathDirectory + '\\summary.js');
+    }
+    });
+} else {
+    console.error("Введите путь к файлу!");
+}
+ */
+
+let file = fs.writeFile(`${name}/summary.js`,function (err,
+                                                       ) {
     fs.mkdir(`${name}/${lastDir}`, () => {});
     fs.readdir(name, (err, files) => {
         files.forEach(file => {
@@ -33,9 +58,8 @@ let file = fs.writeFile(`${name}/summary.js`,'','',function (err) {
                 }
             })
         });
-    })
+    });
     fs.readFile('config.json', (err, str) => {
-       console.log(str.toString());
         fs.readdir(`${name}/${lastDir}`, (err, files) => {
             files.forEach(file => {
                 fs.readFile(`${name}/${lastDir}/${file}`, (err, deepStr) => {
@@ -44,4 +68,27 @@ let file = fs.writeFile(`${name}/summary.js`,'','',function (err) {
             })
         })
     });
+    let filesArrInfo = [];
+    fs.readdir(`${name}/${lastDir}`, (err, files) =>{
+        files.forEach(file => {
+            fs.readFile(`${name}/${lastDir}/${file}`, (err, info) => {
+                filesArrInfo.append(info);
+            })
+        })
+    });
+    while (true) {
+        fs.readdir(`${name}/${lastDir}`, (err, files) =>{
+            let iter = 0;
+            files.forEach(file => {
+                fs.readFile(`${name}/${lastDir}/${file}`, (err, info) => {
+                    if(filesArrInfo[iter] != info)
+                    {
+                        console.log(`changed file - ${file}`);
+                        filesArrInfo[iter] = info;
+                    }
+                    iter++;
+                })
+            })
+        })
+    }
 });
