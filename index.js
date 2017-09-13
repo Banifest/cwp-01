@@ -5,90 +5,50 @@ let name = process.argv[2];
 
 let lastDir = path.normalize(name).split('\\').pop();
 
-/*
-
-if (pathDirectory != undefined){
-
-    fs.stat(pathDirectory, function(err, stats) {
-
-        if (err || !(stats.isDirectory())) {
-            console.error("Неверный путь!");
-        }
-        else {
-
-            fs.writeFile(pathDirectory + '\\summary.js', stringScript, function(error){
-                if (error)
-                    console.error("Ошибка создания файла!");
-            });
-
-            console.log('node ' + pathDirectory + '\\summary.js');
-    }
-    });
-} else {
-    console.error("Введите путь к файлу!");
-}
- */
-
-let file = fs.writeFile(`${name}/summary.js`,function (err,
-                                                       ) {
-    fs.mkdir(`${name}/${lastDir}`, () => {});
-    fs.readdir(name, (err, files) => {
-        files.forEach(file => {
-            console.log(file);
-            let str = `${name}/${file}`;
-            fs.stat(str, function(err, stats){
-                if(stats.isDirectory())
-                {
-                    fs.readdir(str, function (err, deepFiles) {
-                        deepFiles.forEach(deepFile => {
-                            console.log(file + '/' + deepFile);
-                            fs.stat(`${str}/${deepFile}`, (err, deepStats) => {
-                                if (deepStats.isFile() && deepFile.length >= 4 && deepFile.indexOf('.txt') !== -1) {
-
-                                }
-                            })
-                        })
-                    })
-                }
-                else if (file.length >= 4 && file.indexOf('.txt') !== -1) {
-                    fs.readFile(`${name}/${file}`, (err, deepStr) => {
-                        fs.writeFile(`${name}/${lastDir}/${file}`, `${deepStr.toString()}`, () => {
-                        });
-                    })
-                }
-            })
-        });
-    });
-    fs.readFile('config.json', (err, str) => {
-        fs.readdir(`${name}/${lastDir}`, (err, files) => {
-            files.forEach(file => {
-                fs.readFile(`${name}/${lastDir}/${file}`, (err, deepStr) => {
-                    fs.writeFile(`${name}/${lastDir}/${file}`, `${str.toString()}${deepStr.toString()}${str.toString()}`, () => {});
-                });
-            })
-        })
-    });
-    let filesArrInfo = [];
-    fs.readdir(`${name}/${lastDir}`, (err, files) =>{
-        files.forEach(file => {
-            fs.readFile(`${name}/${lastDir}/${file}`, (err, info) => {
-                filesArrInfo.append(info);
-            })
-        })
-    });
-    while (true) {
-        fs.readdir(`${name}/${lastDir}`, (err, files) =>{
-            let iter = 0;
-            files.forEach(file => {
-                fs.readFile(`${name}/${lastDir}/${file}`, (err, info) => {
-                    if(filesArrInfo[iter] != info)
-                    {
-                        console.log(`changed file - ${file}`);
-                        filesArrInfo[iter] = info;
-                    }
-                    iter++;
-                })
-            })
-        })
-    }
-});
+fs.writeFile(`${name}/summary.js`,'const fs = require("fs");\n' +
+    'const path = require("path");\n' +
+    '\n' +
+    `let name = \'../${lastDir}\';\n` +
+    `let lastDir = \'${lastDir}\';\n` +
+    '\n' +
+    'fs.mkdir(`${lastDir}`, () => {});\n' +
+    'fs.readdir(name, (err, files) => {\n' +
+    '    for (const file of files) {\n' +
+    '        if (file !== `${lastDir}`) {\n' +
+    '            console.log(file);\n' +
+    '            let str = `${name}/${file}`;\n' +
+    '            fs.stat(str, function (err, stats) {\n' +
+    '                if (stats.isDirectory()) {\n' +
+    '                    fs.readdir(str, function (err, deepFiles) {\n' +
+    '                        for (const deepFile of deepFiles) {\n' +
+    '                            console.log(file + \'/\' + deepFile);\n' +
+    '                            fs.stat(`${str}/${deepFile}`, (err, deepStats) => {\n' +
+    '                                if (deepStats.isFile() && deepFile.length >= 4 && deepFile.indexOf(\'.txt\') !== -1) {\n' +
+    '                                    fs.readFile(\'C:\\\\Users\\\\banif\\\\WebstormProjects\\\\cwp-01\\\\config.json\', (err, strLast) => {\n' +
+    '                                        fs.readFile(`${str}/${deepFile}`, (err, deepStr) => {\n' +
+    '                                            fs.writeFile(`${name}/${lastDir}/${deepFile}`, `${strLast.toString()}\n' +
+    '                                        ${deepStr.toString()}${strLast.toString()}`, () => {\n' +
+    '                                            });\n' +
+    '                                        })\n' +
+    '                                    })\n' +
+    '                                }\n' +
+    '                            });\n' +
+    '                        }\n' +
+    '                    })\n' +
+    '                }\n' +
+    '                else if (file.length >= 4 && file.indexOf(\'.txt\') !== -1) {\n' +
+    '                    fs.readFile(\'C:\\\\Users\\\\banif\\\\WebstormProjects\\\\cwp-01\\\\config.json\', (err, strLast) => {\n' +
+    '                        fs.readFile(`${name}/${file}`, (err, deepStr) => {\n' +
+    '                            fs.writeFile(`${name}/${lastDir}/${file}`, `${strLast.toString()}${deepStr.toString()}${strLast.toString()}`, () => {\n' +
+    '                            });\n' +
+    '                        })\n' +
+    '                    })\n' +
+    '                }\n' +
+    '            })\n' +
+    '        }\n' +
+    '    }\n' +
+    '    fs.watch(`${name}/${lastDir}`, {encoding: \'buffer\'}, (eventType, filename) => {\n' +
+    '        if (filename) { console.log(filename.toString()); }\n' +
+    '    });\n' +
+    '});'
+    , ()=> {});
